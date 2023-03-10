@@ -3,18 +3,14 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 
 class TestSHOPPINGCART(unittest.TestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome(ChromeDriverManager().install())
-
-def test_success_login(self):
-        driver = self.browser
-        driver.get("https://demowebshop.tricentis.com/login")
-        driver.find_element(By.ID, "Email").send_keys("rezha.cacahrian@gmail.com")
-        driver.find_element(By.ID, "Password").send_keys("123456")
-        driver.find_element(By.CLASS_NAME, "login-button").click()
 
 #shoppingcart_empty
     def test_success_shoppingcart_empty(self):
@@ -144,7 +140,11 @@ def test_success_login(self):
 #shoppingcart_checkout
     def test_success_shoppingcart_checkout(self):
         driver = self.browser
-        driver.get("https://demowebshop.tricentis.com/")
+        driver.get("https://demowebshop.tricentis.com/login")
+        driver.find_element(By.ID, "Email").send_keys("rezha.cahrian@gmail.com")
+        driver.find_element(By.ID, "Password").send_keys("123456")
+        driver.find_element(By.CLASS_NAME, "login-button").click()
+
         driver.find_element(By.LINK_TEXT, "Books").click()
         respon = driver.find_element(By.CLASS_NAME, "page-title").text
         self.assertIn("Books", respon)        
@@ -170,6 +170,45 @@ def test_success_login(self):
         driver.find_element(By.ID, "checkout").click()
         success_shoppingcart_book_url = driver.current_url
         self.assertEqual(success_shoppingcart_book_url, "https://demowebshop.tricentis.com/onepagecheckout")
+        
+        driver.find_element(By.ID, "BillingNewAddress_FirstName").send_keys("Rezha")
+        driver.find_element(By.ID, "BillingNewAddress_LastName").send_keys("Sachrian")
+        driver.find_element(By.ID, "BillingNewAddress_Email").send_keys("rzhschr@gmail.com")
+        driver.find_element(By.ID, "BillingNewAddress_Company").send_keys("S154")
+        driver.find_element(By.ID, "BillingNewAddress_Address1").send_keys("BANDUNG")
+        driver.find_element(By.ID, "BillingNewAddress_Address2").send_keys("JALAN")
+        driver.find_element(By.ID, "BillingNewAddress_City").send_keys("CICAHEUM")
+        driver.find_element(By.ID, "BillingNewAddress_ZipPostalCode").send_keys("40001")
+        driver.find_element(By.ID, "BillingNewAddress_PhoneNumber").send_keys("0857222222222")
+        driver.find_element(By.ID, "BillingNewAddress_FaxNumber").send_keys("12309")
+        pilih = Select(driver.find_element(By.ID, "BillingNewAddress_CountryId"))
+        pilih.select_by_value('88')
+
+        pilih = Select(driver.find_element(By.ID, "BillingNewAddress_StateProvinceId"))
+        pilih.select_by_value('0')
+        driver.find_element(By.ID, "billing-buttons-container").click()
+        respon = driver.find_element(By.TAG_NAME, "h2").text
+        self.assertIn("Shipping address", respon)
+
+        pilih = Select(driver.find_element(By.ID, "shipping-address-select"))
+        pilih.select_by_value('2977502')
+        driver.find_element(By.ID, "shipping-buttons-container").click()
+
+        driver.find_element(By.ID, "shipping-method-buttons-container").click()
+        respon = driver.find_element(By.TAG_NAME, "h2").text
+        self.assertIn("Payment method", respon)
+
+        driver.find_element(By.ID, "payment-method-buttons-container").click()
+        respon = driver.find_element(By.TAG_NAME, "h2").text
+        self.assertIn("Payment information", respon)
+
+        driver.find_element(By.ID, "payment-info-buttons-container").click()
+        respon = driver.find_element(By.TAG_NAME, "h2").text
+        self.assertIn("Confirm order", respon)
+
+        driver.find_element(By.ID, "confirm-order-buttons-container").click()
+        respon = driver.find_element(By.CLASS_NAME, "title").text
+        self.assertIn("Your order has been successfully processed!", respon)
 
 if __name__ == '__main__':
     unittest.main()
